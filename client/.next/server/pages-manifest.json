@@ -2,9 +2,5 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/logout": "pages/logout.html",
-  "/onboarding": "pages/onboarding.html",
-  "/": "pages/index.html",
-  "/login": "pages/login.html",
-  "/404": "pages/404.html"
+  "/onboarding": "pages/onboarding.js"
 }

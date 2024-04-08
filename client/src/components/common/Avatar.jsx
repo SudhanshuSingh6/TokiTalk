@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { FaCamera } from "react-icons/fa";
 import ContextMenu from "./ContextMenu.jsx";
+import PhotoPicker from "./PhotoPicker.jsx";
 
 function Avatar({ type, image, setImage }) {
   const [hover, sethover] = useState(false);
@@ -10,14 +11,52 @@ function Avatar({ type, image, setImage }) {
     x: 0,
     y: 0,
   });
+  const [grabPhoto, setGrabPhoto] = useState(false);
   const showContextMenu = (e) => {
     e.preventDefault();
     setIsContextMenuAvailable(true);
     setContextMenuCordinates({ x: e.pageX, y: e.pageY });
-    console.log(image);
   };
-
-  const contextMenuOptions = [{ name: "Take Photo", callback: () => {} }];
+  useEffect(() => {
+    if (grabPhoto) {
+      const data = document.getElementById("photo-picker");
+      data.click();
+      document.body.onfocus = (e) => {
+        setTimeout(() => {
+          setGrabPhoto(false);
+        }, 1000);
+      };
+    }
+  }, [grabPhoto]);
+  const contextMenuOptions = [
+    { name: "Take Photo", callback: () => {} },
+    { name: "Choose From Library", callback: () => {} },
+    {
+      name: "Upload Photo",
+      callback: () => {
+        setGrabPhoto(true);
+      },
+    },
+    {
+      name: "Remove Photo",
+      callback: () => {
+        setImage("/default_avatar.png");
+      },
+    },
+  ];
+  const photoPickerchange = async (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    const data = document.createElement("img");
+    reader.onload = function (event) {
+      data.src = event.target.result;
+      data.setAttribute("data-src", event.target.result);
+    };
+    reader.readAsDataURL(file);
+    setTimeout(() => {
+      setTimeout(data.src);
+    }, 100);
+  };
   return (
     <>
       <div className="flex items-center justify-center">
@@ -38,7 +77,7 @@ function Avatar({ type, image, setImage }) {
             onMouseLeave={() => sethover(false)}
           >
             <div
-              className={`bg-photopicker-overlay-background h-60 w-60 absolute top-0 left-0 flex items-center rounded-full justify-center flex-col text-center gap-2${
+              className={`z-10 bg-photopicker-overlay-background h-60 w-60 absolute top-0 left-0 flex items-center rounded-full justify-center flex-col text-center gap-2${
                 hover ? "visible" : "hidden"
               }`}
               onClick={(e) => showContextMenu(e)}
@@ -67,6 +106,7 @@ function Avatar({ type, image, setImage }) {
           setContextMenu={setIsContextMenuAvailable}
         ></ContextMenu>
       )}
+      {grabPhoto && <PhotoPicker onChange={photoPickerchange} />}
     </>
   );
 }
